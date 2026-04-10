@@ -15,11 +15,9 @@ supported.vendorpatchlevels=
 if [ -e /dev/block/bootdevice/by-name/vendor_boot ]; then
   IS_SLOT_DEVICE=1;
   VENDOR_BOOT_EXIST=1;
-  ui_print "Device have vendor_boot!";
 else
   IS_SLOT_DEVICE=0;
   VENDOR_BOOT_EXIST=0;
-  ui_print "Device do not have vendor_boot!";
 fi
 
 # boot variables
@@ -36,6 +34,8 @@ write_boot;
 
 # vendor_boot
 if [ $VENDOR_BOOT_EXIST -eq 1 ]; then
+  # print vendor_boot are detected
+  ui_print "Device have vendor_boot!";
   # vendor_boot variables
   BLOCK=/dev/block/bootdevice/by-name/vendor_boot;
   RAMDISK_COMPRESSION=auto;
@@ -44,4 +44,6 @@ if [ $VENDOR_BOOT_EXIST -eq 1 ]; then
   reset_ak;
   dump_boot;
   write_boot;
+else
+  ui_print "Device do not have vendor_boot, skipping vendor_boot...";
 fi
