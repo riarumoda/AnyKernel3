@@ -29,8 +29,6 @@ OFOX_VER=$(getprop ro.orangefox.version)
 LINEAGE_VER=$(getprop ro.lineage.build.version)
 
 # check recovery environment
-ui_print "- Checking recovery environment..."
-
 if [ "$TWRP_BOOT" == "1" ] || [ -n "$TWRP_VER" ] || [ -n "$OFOX_VER" ]; then
   ui_print "- Unsupported Recovery Detected!"
   ui_print "- Please flash this kernel using LineageOS Recovery."
@@ -46,6 +44,7 @@ fi
 # print recovery kernel and recovery version
 ui_print "- Recovery Version: $LINEAGE_VER";
 ui_print "- Recovery Kernel Version: $KERNEL_PRINT_VERSION";
+ui_print "- Is vendor_boot partition exist: $VENDOR_BOOT_EXIST";
 
 # boot variables
 BLOCK=/dev/block/bootdevice/by-name/boot;
@@ -57,15 +56,12 @@ PATCH_VBMETA_FLAG=auto;
 
 # boot install
 if [ "$KERNEL_VERSION" = "4.4" -o "$KERNEL_VERSION" = "4.9" -o "$KERNEL_VERSION" = "4.14" -o "$KERNEL_VERSION" = "4.19" ]; then
-  ui_print "- Device is 4.x kernel, using ak3-core dump_boot and write_boot!";
   dump_boot;
   write_boot;
 elif [ "$KERNEL_VERSION" = "5.4" ]; then
-  ui_print "- Device is 5.4 kernel, using ak3-core split_boot and flash_boot!";
   split_boot;
   flash_boot;
 else
-  ui_print "- Either 3.x or GKI Kernel!!! Aborting...";
   exit 1;
 fi
 
@@ -80,15 +76,12 @@ if [ $VENDOR_BOOT_EXIST -eq 1 ]; then
   # vendor_boot install
   reset_ak;
   if [ "$KERNEL_VERSION" = "4.4" -o "$KERNEL_VERSION" = "4.9" -o "$KERNEL_VERSION" = "4.14" -o "$KERNEL_VERSION" = "4.19" ]; then
-    ui_print "- Device is 4.x kernel, using ak3-core dump_boot and write_boot!";
     dump_boot;
     write_boot;
   elif [ "$KERNEL_VERSION" = "5.4" ]; then
-    ui_print "- Device is 5.4 kernel, using ak3-core split_boot and flash_boot!";
     split_boot;
     flash_boot;
   else
-    ui_print "- Either 3.x or GKI Kernel!!! Aborting...";
     exit 1;
   fi
 else
