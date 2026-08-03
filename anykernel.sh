@@ -28,6 +28,14 @@ TWRP_VER=$(getprop ro.twrp.version)
 OFOX_VER=$(getprop ro.orangefox.version)
 LINEAGE_VER=$(getprop ro.lineage.build.version)
 
+# boot variables
+BLOCK=/dev/block/bootdevice/by-name/boot;
+RAMDISK_COMPRESSION=auto;
+PATCH_VBMETA_FLAG=auto;
+
+# import ak3 core functions
+. tools/ak3-core.sh;
+
 # check recovery environment
 if [ "$TWRP_BOOT" == "1" ] || [ -n "$TWRP_VER" ] || [ -n "$OFOX_VER" ]; then
   ui_print "- Unsupported Recovery Detected!"
@@ -45,14 +53,6 @@ fi
 ui_print "- Recovery Version: $LINEAGE_VER";
 ui_print "- Recovery Kernel Version: $KERNEL_PRINT_VERSION";
 ui_print "- Is vendor_boot partition exist: $VENDOR_BOOT_EXIST";
-
-# boot variables
-BLOCK=/dev/block/bootdevice/by-name/boot;
-RAMDISK_COMPRESSION=auto;
-PATCH_VBMETA_FLAG=auto;
-
-# import ak3 core functions
-. tools/ak3-core.sh;
 
 # boot install
 if [ "$KERNEL_VERSION" = "4.4" -o "$KERNEL_VERSION" = "4.9" -o "$KERNEL_VERSION" = "4.14" -o "$KERNEL_VERSION" = "4.19" ]; then
@@ -84,6 +84,4 @@ if [ $VENDOR_BOOT_EXIST -eq 1 ]; then
   else
     exit 1;
   fi
-else
-  ui_print "- Device do not have vendor_boot, skipping vendor_boot...";
 fi
