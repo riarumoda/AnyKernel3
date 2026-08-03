@@ -11,6 +11,9 @@ supported.patchlevels=
 supported.vendorpatchlevels=
 '; }
 
+# kernel build type
+KERNEL_BUILD_TYPE="Weekly";
+
 # check if device have vendor_boot
 if [ -e /dev/block/bootdevice/by-name/vendor_boot ]; then
   VENDOR_BOOT_EXIST=1;
@@ -37,19 +40,21 @@ PATCH_VBMETA_FLAG=auto;
 . tools/ak3-core.sh;
 
 # check recovery environment
-if [ "$TWRP_BOOT" == "1" ] || [ -n "$TWRP_VER" ] || [ -n "$OFOX_VER" ]; then
-  ui_print "- Unsupported Recovery Detected!"
-  ui_print "- Please flash this kernel using LineageOS Recovery."
-  exit 1
-fi
-
-if [ -z "$LINEAGE_VER" ]; then
-  ui_print "- LineageOS Recovery not detected."
-  ui_print "- Aborting installation to prevent compatibility issues."
-  exit 1
+if [ "$KERNEL_BUILD_TYPE" == "Weekly" ]; then
+  if [ "$TWRP_BOOT" == "1" ] || [ -n "$TWRP_VER" ] || [ -n "$OFOX_VER" ]; then
+    ui_print "- Unsupported Recovery Detected!"
+    ui_print "- Please flash this kernel using LineageOS Recovery."
+    exit 1
+  fi
+  if [ -z "$LINEAGE_VER" ]; then
+    ui_print "- LineageOS Recovery not detected."
+    ui_print "- Aborting installation to prevent compatibility issues."
+    exit 1
+  fi
 fi
 
 # print recovery kernel and recovery version
+ui_print "- Kernel Build Type: $KERNEL_BUILD_TYPE";
 ui_print "- Recovery Version: $LINEAGE_VER";
 ui_print "- Recovery Kernel Version: $KERNEL_PRINT_VERSION";
 ui_print "- Is vendor_boot partition exist: $VENDOR_BOOT_EXIST";
