@@ -93,6 +93,7 @@ fi
 ui_print "- Kernel Build Type: $KERNEL_BUILD_TYPE";
 ui_print "- Is vendor_boot partition exist: $VENDOR_BOOT_EXIST";
 ui_print "- Is super partition exist: $SUPER_EXIST";
+ui_print "- Is installer running in recovery: $IS_ON_RECOVERY";
 
 # unmount system in here instead to avoid issues, recovery only
 if [ $IS_ON_RECOVERY -eq 1 ]; then
