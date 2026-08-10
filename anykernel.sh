@@ -63,17 +63,16 @@ if [ "$KERNEL_BUILD_TYPE" == "Weekly" ]; then
     umount /mnt/temp_system;
     $BIN/lptools_static unmap system;
   else
+    mkdir -p /tmp/temp_system;
     mount -t ext4 -o ro /dev/block/bootdevice/by-name/system /tmp/temp_system;
     SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lineage.build.version" | cut -d'=' -f2);
     if [ "$SYSTEM_VER" != "22.0" && "$SYSTEM_VER" != "22.1" && "$SYSTEM_VER" != "22.2" && "$SYSTEM_VER" != "23.0" && "$SYSTEM_VER" != "23.1" && "$SYSTEM_VER" != "23.2" ]; then
       ui_print "- This OS is not supported.";
       ui_print "- Aborting installation to prevent compatibility issues.";
       umount /mnt/temp_system;
-      $BIN/lptools_static unmap system;
       exit 1;
     fi
     umount /mnt/temp_system;
-    $BIN/lptools_static unmap system;
   fi
 fi
 
