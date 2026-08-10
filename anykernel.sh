@@ -28,15 +28,17 @@ else
   SUPER_EXIST=0;
 fi
 
+# grab details of installer running in recovery
+RECOVERY_DETAIL=$(getprop init.svc.recovery);
+if [ "$RECOVERY_DETAIL" == "recovery" ]; then
+  IS_ON_RECOVERY=1;
+else
+  IS_ON_RECOVERY=0;
+fi
+
 # grab kernel version from recovery
 KERNEL_VERSION=$(cat /proc/version | cut -d' ' -f3 | cut -d'.' -f1,2);
 KERNEL_PRINT_VERSION=$(cat /proc/version | cut -d' ' -f3);
-
-# grab recovery properties
-TWRP_BOOT=$(getprop ro.twrp.boot)
-TWRP_VER=$(getprop ro.twrp.version)
-OFOX_VER=$(getprop ro.orangefox.version)
-LINEAGE_VER=$(getprop ro.lineage.build.version)
 
 # boot variables
 BLOCK=/dev/block/bootdevice/by-name/boot;
@@ -47,54 +49,60 @@ PATCH_VBMETA_FLAG=auto;
 . tools/ak3-core.sh;
 
 # check super environment
-if [ "$KERNEL_BUILD_TYPE" == "Weekly" ]; then
-  if [ $SUPER_EXIST -eq 1 ]; then
-    $BIN/lptools_static map system;
-    mkdir -p /tmp/temp_system;
-    mount -t ext4 -o ro /dev/block/mapper/system /tmp/temp_system;
-    SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lineage.build.version" | cut -d'=' -f2);
+if [ $IS_ON_RECOVERY -eq 1 ]; then
+  if [ "$KERNEL_BUILD_TYPE" == "Weekly" ]; then
+    if [ $SUPER_EXIST -eq 1 ]; then
+      $BIN/lptools_static map system;
+      mkdir -p /tmp/temp_system;
+      mount -t ext4 -o ro /dev/block/mapper/system /tmp/temp_system;
+      SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lineage.build.version" | cut -d'=' -f2);
+      if [ "$SYSTEM_VER" != "22.0" && "$SYSTEM_VER" != "22.1" && "$SYSTEM_VER" != "22.2" && "$SYSTEM_VER" != "23.0" && "$SYSTEM_VER" != "23.1" && "$SYSTEM_VER" != "23.2" ]; then
+        ui_print "- This OS is not supported.";
+        ui_print "- Aborting installation to prevent compatibility issues.";
+        umount /mnt/temp_system;
+        $BIN/lptools_static unmap system;
+        exit 1;
+      fi
+    elif [ $SUPER_EXIST -eq 0 ]; then
+      mkdir -p /tmp/temp_system;
+      mount -t ext4 -o ro /dev/block/bootdevice/by-name/system /tmp/temp_system;
+      SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lineage.build.version" | cut -d'=' -f2);
+      if [ "$SYSTEM_VER" != "22.0" && "$SYSTEM_VER" != "22.1" && "$SYSTEM_VER" != "22.2" && "$SYSTEM_VER" != "23.0" && "$SYSTEM_VER" != "23.1" && "$SYSTEM_VER" != "23.2" ]; then
+        ui_print "- This OS is not supported.";
+        ui_print "- Aborting installation to prevent compatibility issues.";
+        umount /mnt/temp_system;
+        exit 1;
+      fi
+    fi
+  fi
+elif [ $IS_ON_RECOVERY -eq 0 ]; then
+  if [ $KERNEL_BUILD_TYPE == "Weekly" ];then
+    SYSTEM_VER=$(getprop ro.lineage.build.version);
     if [ "$SYSTEM_VER" != "22.0" && "$SYSTEM_VER" != "22.1" && "$SYSTEM_VER" != "22.2" && "$SYSTEM_VER" != "23.0" && "$SYSTEM_VER" != "23.1" && "$SYSTEM_VER" != "23.2" ]; then
       ui_print "- This OS is not supported.";
       ui_print "- Aborting installation to prevent compatibility issues.";
-      umount /mnt/temp_system;
-      $BIN/lptools_static unmap system;
       exit 1;
     fi
-    umount /mnt/temp_system;
-    $BIN/lptools_static unmap system;
-  else
-    mkdir -p /tmp/temp_system;
-    mount -t ext4 -o ro /dev/block/bootdevice/by-name/system /tmp/temp_system;
-    SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lineage.build.version" | cut -d'=' -f2);
-    if [ "$SYSTEM_VER" != "22.0" && "$SYSTEM_VER" != "22.1" && "$SYSTEM_VER" != "22.2" && "$SYSTEM_VER" != "23.0" && "$SYSTEM_VER" != "23.1" && "$SYSTEM_VER" != "23.2" ]; then
-      ui_print "- This OS is not supported.";
-      ui_print "- Aborting installation to prevent compatibility issues.";
-      umount /mnt/temp_system;
-      exit 1;
-    fi
-    umount /mnt/temp_system;
-  fi
-fi
-
-# check recovery environment
-if [ "$KERNEL_BUILD_TYPE" == "Weekly" ]; then
-  if [ "$TWRP_BOOT" == "1" ] || [ -n "$TWRP_VER" ] || [ -n "$OFOX_VER" ]; then
-    ui_print "- Unsupported Recovery Detected!"
-    ui_print "- The installer will continue but may not work correctly."
-  fi
-  if [ -z "$LINEAGE_VER" ]; then
-    ui_print "- LineageOS Recovery not detected."
-    ui_print "- The installer will continue but may not work correctly."
   fi
 fi
 
 # print recovery kernel and recovery version
 ui_print "- Kernel Build Type: $KERNEL_BUILD_TYPE";
 ui_print "- LineageOS Version: $SYSTEM_VER";
-ui_print "- Recovery Version: $LINEAGE_VER";
-ui_print "- Recovery Kernel Version: $KERNEL_PRINT_VERSION";
 ui_print "- Is vendor_boot partition exist: $VENDOR_BOOT_EXIST";
 ui_print "- Is super partition exist: $SUPER_EXIST";
+
+# unmount system in here instead to avoid issues, recovery only
+if [ $IS_ON_RECOVERY -eq 1 ]; then
+  if [ $KERNEL_BUILD_TYPE == "Weekly" ];then
+    if [ $SUPER_EXIST -eq 1 ]; then
+      umount /tmp/temp_system;
+      $BIN/lptools_static unmap system;
+    elif [ $SUPER_EXIST -eq 0 ]; then
+      umount /tmp/temp_system;
+    fi
+  fi
+fi
 
 # boot install
 if [ "$KERNEL_VERSION" = "4.4" -o "$KERNEL_VERSION" = "4.9" -o "$KERNEL_VERSION" = "4.14" -o "$KERNEL_VERSION" = "4.19" ]; then
