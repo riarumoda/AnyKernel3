@@ -87,8 +87,10 @@ elif [ $IS_ON_RECOVERY -eq 0 ]; then
 fi
 
 # print recovery kernel and recovery version
+if [ $KERNEL_BUILD_TYPE == "Weekly" ]; then
+  ui_print "- LineageOS Version: $SYSTEM_VER";
+fi
 ui_print "- Kernel Build Type: $KERNEL_BUILD_TYPE";
-ui_print "- LineageOS Version: $SYSTEM_VER";
 ui_print "- Is vendor_boot partition exist: $VENDOR_BOOT_EXIST";
 ui_print "- Is super partition exist: $SUPER_EXIST";
 
