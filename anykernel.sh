@@ -30,7 +30,7 @@ fi
 
 # grab details of installer running in recovery
 RECOVERY_DETAIL=$(getprop init.svc.recovery);
-if [ "$RECOVERY_DETAIL" == "recovery" ]; then
+if [ "$RECOVERY_DETAIL" == "running" ]; then
   IS_ON_RECOVERY=1;
 else
   IS_ON_RECOVERY=0;
@@ -55,13 +55,13 @@ if [ $IS_ON_RECOVERY -eq 1 ]; then
       $BIN/lptools_static map system;
       mkdir -p /tmp/temp_system;
       mount -t ext4 -o ro /dev/block/mapper/system /tmp/temp_system;
-      SYSTEM_VER=$(grep "ro.lineage.build.version" /tmp/temp_system/system/build.prop | cut -d'=' -f2 | cut -d'.' -f1)
+      SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lineage.build.version" | cut -d'=' -f2 | cut -d'.' -f1);
       # check if SYSTEM_VER is empty
       if [ -z "$SYSTEM_VER" ]; then
         ui_print "- Unable to grab properties of ro.lineage.build.version.";
         ui_print "- Checking if this is LibreMobileOS...";
         LMODROID_CHECK=1;
-        SYSTEM_VER=$(grep "ro.lmodroid.version" /tmp/temp_system/system/build.prop | cut -d'=' -f2 | cut -d'.' -f1)
+        SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lmodroid.version" | cut -d'=' -f2 | cut -d'.' -f1);
         # check if SYSTEM_VER is empty again
         if [ -z "$SYSTEM_VER" ]; then
           ui_print "- Unable to grab properties of ro.lmodroid.version.";
@@ -81,13 +81,13 @@ if [ $IS_ON_RECOVERY -eq 1 ]; then
     elif [ $SUPER_EXIST -eq 0 ]; then
       mkdir -p /tmp/temp_system;
       mount -t ext4 -o ro /dev/block/bootdevice/by-name/system /tmp/temp_system;
-      SYSTEM_VER=$(grep "ro.lineage.build.version" /tmp/temp_system/system/build.prop | cut -d'=' -f2 | cut -d'.' -f1)
+      SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lineage.build.version" | cut -d'=' -f2 | cut -d'.' -f1);
       # check if SYSTEM_VER is empty
       if [ -z "$SYSTEM_VER" ]; then
         ui_print "- Unable to grab properties of ro.lineage.build.version.";
         ui_print "- Checking if this is LibreMobileOS...";
         LMODROID_CHECK=1;
-        SYSTEM_VER=$(grep "ro.lmodroid.version" /tmp/temp_system/system/build.prop | cut -d'=' -f2 | cut -d'.' -f1)
+        SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lmodroid.version" | cut -d'=' -f2 | cut -d'.' -f1);
         # check if SYSTEM_VER is empty again
         if [ -z "$SYSTEM_VER" ]; then
           ui_print "- Unable to grab properties of ro.lmodroid.version.";
