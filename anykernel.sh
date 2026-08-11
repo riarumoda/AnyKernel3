@@ -55,8 +55,8 @@ if [ $IS_ON_RECOVERY -eq 1 ]; then
       $BIN/lptools_static map system;
       mkdir -p /tmp/temp_system;
       mount -t ext4 -o ro /dev/block/mapper/system /tmp/temp_system;
-      SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lineage.build.version" | cut -d'=' -f2);
-      if [ "$SYSTEM_VER" != "22.0" && "$SYSTEM_VER" != "22.1" && "$SYSTEM_VER" != "22.2" && "$SYSTEM_VER" != "23.0" && "$SYSTEM_VER" != "23.1" && "$SYSTEM_VER" != "23.2" ]; then
+      SYSTEM_VER=$(grep "ro.lineage.build.version" /tmp/temp_system/system/build.prop | cut -d'=' -f2 | cut -d'.' -f1)
+      if [ "$SYSTEM_VER" != "22" && "$SYSTEM_VER" != "23" && "$SYSTEM_VER" != "3" && "$SYSTEM_VER" != "4" ]; then
         ui_print "- This OS is not supported.";
         ui_print "- Aborting installation to prevent compatibility issues.";
         umount /mnt/temp_system;
@@ -66,8 +66,8 @@ if [ $IS_ON_RECOVERY -eq 1 ]; then
     elif [ $SUPER_EXIST -eq 0 ]; then
       mkdir -p /tmp/temp_system;
       mount -t ext4 -o ro /dev/block/bootdevice/by-name/system /tmp/temp_system;
-      SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lineage.build.version" | cut -d'=' -f2);
-      if [ "$SYSTEM_VER" != "22.0" && "$SYSTEM_VER" != "22.1" && "$SYSTEM_VER" != "22.2" && "$SYSTEM_VER" != "23.0" && "$SYSTEM_VER" != "23.1" && "$SYSTEM_VER" != "23.2" ]; then
+      SYSTEM_VER=$(grep "ro.lineage.build.version" /tmp/temp_system/system/build.prop | cut -d'=' -f2 | cut -d'.' -f1)
+      if [ "$SYSTEM_VER" != "22" && "$SYSTEM_VER" != "23" && "$SYSTEM_VER" != "3" && "$SYSTEM_VER" != "4" ]; then
         ui_print "- This OS is not supported.";
         ui_print "- Aborting installation to prevent compatibility issues.";
         umount /mnt/temp_system;
@@ -77,8 +77,8 @@ if [ $IS_ON_RECOVERY -eq 1 ]; then
   fi
 elif [ $IS_ON_RECOVERY -eq 0 ]; then
   if [ $KERNEL_BUILD_TYPE == "Weekly" ];then
-    SYSTEM_VER=$(getprop ro.lineage.build.version);
-    if [ "$SYSTEM_VER" != "22.0" && "$SYSTEM_VER" != "22.1" && "$SYSTEM_VER" != "22.2" && "$SYSTEM_VER" != "23.0" && "$SYSTEM_VER" != "23.1" && "$SYSTEM_VER" != "23.2" ]; then
+    SYSTEM_VER=$(getprop ro.lineage.build.version | cut -d'.' -f1);
+    if [ "$SYSTEM_VER" != "22" && "$SYSTEM_VER" != "23" && "$SYSTEM_VER" != "3" && "$SYSTEM_VER" != "4" ]; then
       ui_print "- This OS is not supported.";
       ui_print "- Aborting installation to prevent compatibility issues.";
       exit 1;
@@ -86,9 +86,13 @@ elif [ $IS_ON_RECOVERY -eq 0 ]; then
   fi
 fi
 
-# print recovery kernel and recovery version
+# print build and device information
 if [ $KERNEL_BUILD_TYPE == "Weekly" ]; then
-  ui_print "- LineageOS Version: $SYSTEM_VER";
+  if [$SYSTEM_VER == "22" || $SYSTEM_VER == "23" ]; then
+    ui_print "- LineageOS Version: $SYSTEM_VER";
+  elif [$SYSTEM_VER == "3" || $SYSTEM_VER == "4" ]; then
+    ui_print "- /e/ OS Version: $SYSTEM_VER";
+  fi
 fi
 ui_print "- Kernel Build Type: $KERNEL_BUILD_TYPE";
 ui_print "- Is vendor_boot partition exist: $VENDOR_BOOT_EXIST";
