@@ -60,6 +60,7 @@ if [ $IS_ON_RECOVERY -eq 1 ]; then
       if [ -z "$SYSTEM_VER" ]; then
         ui_print "- Unable to grab properties of ro.lineage.build.version.";
         ui_print "- Checking if this is LibreMobileOS...";
+        LMODROID_CHECK=1;
         SYSTEM_VER=$(grep "ro.lmodroid.version" /tmp/temp_system/system/build.prop | cut -d'=' -f2 | cut -d'.' -f1)
         # check if SYSTEM_VER is empty again
         if [ -z "$SYSTEM_VER" ]; then
@@ -85,6 +86,7 @@ if [ $IS_ON_RECOVERY -eq 1 ]; then
       if [ -z "$SYSTEM_VER" ]; then
         ui_print "- Unable to grab properties of ro.lineage.build.version.";
         ui_print "- Checking if this is LibreMobileOS...";
+        LMODROID_CHECK=1;
         SYSTEM_VER=$(grep "ro.lmodroid.version" /tmp/temp_system/system/build.prop | cut -d'=' -f2 | cut -d'.' -f1)
         # check if SYSTEM_VER is empty again
         if [ -z "$SYSTEM_VER" ]; then
@@ -109,6 +111,7 @@ elif [ $IS_ON_RECOVERY -eq 0 ]; then
       if [ -z "$SYSTEM_VER" ]; then
         ui_print "- Unable to grab properties of ro.lineage.build.version.";
         ui_print "- Checking if this is LibreMobileOS...";
+        LMODROID_CHECK=1;
         SYSTEM_VER=$(getprop ro.lmodroid.version | cut -d'.' -f1)
         # check if SYSTEM_VER is empty again
         if [ -z "$SYSTEM_VER" ]; then
@@ -126,13 +129,19 @@ elif [ $IS_ON_RECOVERY -eq 0 ]; then
 fi
 
 # print build and device information
-if [ $KERNEL_BUILD_TYPE == "Weekly" ]; then
-  if [$SYSTEM_VER == "22" || $SYSTEM_VER == "23" ]; then
-    ui_print "- LineageOS Version: $SYSTEM_VER";
-  elif [$SYSTEM_VER == "3" || $SYSTEM_VER == "4" ]; then
-    ui_print "- /e/ OS Version: $SYSTEM_VER";
-  elif [$SYSTEM_VER == "5" || $SYSTEM_VER == "6" ]; then
-    ui_print "- LibreMobileOS Version: $SYSTEM_VER";
+if [ $LMODROID_CHECK -eq 1 ]; then
+  if [ $KERNEL_BUILD_TYPE == "Weekly" ]; then
+    if [$SYSTEM_VER == "5" || $SYSTEM_VER == "6" ]; then
+      ui_print "- LibreMobileOS Version: $SYSTEM_VER";
+    fi
+  fi
+else
+  if [ $KERNEL_BUILD_TYPE == "Weekly" ]; then
+    if [$SYSTEM_VER == "22" || $SYSTEM_VER == "23" ]; then
+      ui_print "- LineageOS Version: $SYSTEM_VER";
+    elif [$SYSTEM_VER == "3" || $SYSTEM_VER == "4" ]; then
+      ui_print "- /e/ OS Version: $SYSTEM_VER";
+    fi
   fi
 fi
 ui_print "- Kernel Build Type: $KERNEL_BUILD_TYPE";
