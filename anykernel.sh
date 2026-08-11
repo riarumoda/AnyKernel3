@@ -71,7 +71,7 @@ if [ $IS_ON_RECOVERY -eq 1 ]; then
           exit 1;
         fi
       fi
-      if [ "$SYSTEM_VER" != "22" && "$SYSTEM_VER" != "23" && "$SYSTEM_VER" != "3" && "$SYSTEM_VER" != "4" && "$SYSTEM_VER" != "5" && "$SYSTEM_VER" != "6" ]; then
+      if [ "$SYSTEM_VER" != "22" && "$SYSTEM_VER" != "23" && "$SYSTEM_VER" != "3" && "$SYSTEM_VER" != "4" && "$SYSTEM_VER" != "6" ]; then
         ui_print "- This OS is not supported.";
         ui_print "- Aborting installation to prevent compatibility issues.";
         umount /mnt/temp_system;
@@ -96,7 +96,7 @@ if [ $IS_ON_RECOVERY -eq 1 ]; then
           exit 1;
         fi
       fi
-      if [ "$SYSTEM_VER" != "22" && "$SYSTEM_VER" != "23" && "$SYSTEM_VER" != "3" && "$SYSTEM_VER" != "4" && "$SYSTEM_VER" != "5" && "$SYSTEM_VER" != "6" ]; then
+      if [ "$SYSTEM_VER" != "22" && "$SYSTEM_VER" != "23" && "$SYSTEM_VER" != "3" && "$SYSTEM_VER" != "4" && "$SYSTEM_VER" != "6" ]; then
         ui_print "- This OS is not supported.";
         ui_print "- Aborting installation to prevent compatibility issues.";
         umount /mnt/temp_system;
@@ -120,7 +120,7 @@ elif [ $IS_ON_RECOVERY -eq 0 ]; then
           exit 1;
         fi
       fi
-    if [ "$SYSTEM_VER" != "22" && "$SYSTEM_VER" != "23" && "$SYSTEM_VER" != "3" && "$SYSTEM_VER" != "4" && "$SYSTEM_VER" != "5" && "$SYSTEM_VER" != "6" ]; then
+    if [ "$SYSTEM_VER" != "22" && "$SYSTEM_VER" != "23" && "$SYSTEM_VER" != "3" && "$SYSTEM_VER" != "4" && "$SYSTEM_VER" != "6" ]; then
       ui_print "- This OS is not supported.";
       ui_print "- Aborting installation to prevent compatibility issues.";
       exit 1;
@@ -131,15 +131,15 @@ fi
 # print build and device information
 if [ $LMODROID_CHECK -eq 1 ]; then
   if [ $KERNEL_BUILD_TYPE == "Weekly" ]; then
-    if [$SYSTEM_VER == "5" || $SYSTEM_VER == "6" ]; then
+    if [ $SYSTEM_VER == "6" ]; then
       ui_print "- LibreMobileOS Version: $SYSTEM_VER";
     fi
   fi
 else
   if [ $KERNEL_BUILD_TYPE == "Weekly" ]; then
-    if [$SYSTEM_VER == "22" || $SYSTEM_VER == "23" ]; then
+    if [ $SYSTEM_VER == "22" || $SYSTEM_VER == "23" ]; then
       ui_print "- LineageOS Version: $SYSTEM_VER";
-    elif [$SYSTEM_VER == "3" || $SYSTEM_VER == "4" ]; then
+    elif [ $SYSTEM_VER == "3" || $SYSTEM_VER == "4" ]; then
       ui_print "- /e/ OS Version: $SYSTEM_VER";
     fi
   fi
