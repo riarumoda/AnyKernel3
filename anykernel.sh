@@ -52,25 +52,46 @@ PATCH_VBMETA_FLAG=auto;
 if [ $IS_ON_RECOVERY -eq 1 ]; then
   if [ "$KERNEL_BUILD_TYPE" == "Weekly" ]; then
     if [ $SUPER_EXIST -eq 1 ]; then
-      $BIN/lptools_static map system;
-      mkdir -p /tmp/temp_system;
-      mount -t ext4 -o ro /dev/block/mapper/system /tmp/temp_system;
-      SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lineage.build.version" | cut -d'=' -f2 | cut -d'.' -f1);
-      # check if SYSTEM_VER is empty
+      # lineageos fetch
+      LINEAGE_CHECK=1;
+      EOS_CHECK=0;
+      LMODROID_CHECK=0;
+      $BIN/lptools_static map product;
+      mkdir -p /tmp/temp_product;
+      mount -t ext4 -o ro /dev/block/mapper/product /tmp/temp_product;
+      SYSTEM_VER=$(cat /tmp/temp_product/etc/build.prop | grep "ro.lineage.build.version" | cut -d'=' -f2 | cut -d'.' -f1);
+      # /e/ fetch
       if [ -z "$SYSTEM_VER" ]; then
         ui_print "- Unable to grab properties of ro.lineage.build.version.";
-        ui_print "- Checking if this is LibreMobileOS...";
-        LMODROID_CHECK=1;
-        SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lmodroid.version" | cut -d'=' -f2 | cut -d'.' -f1);
-        # check if SYSTEM_VER is empty again
+        ui_print "- Checking if this is /e/ OS...";
+        LINEAGE_CHECK=0;
+        EOS_CHECK=1;
+        LMODROID_CHECK=0;
+        $BIN/lptools_static map system;
+        mkdir -p /tmp/temp_system;
+        mount -t ext4 -o ro /dev/block/mapper/system /tmp/temp_system;
+        SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lineage.build.version" | cut -d'=' -f2 | cut -d'.' -f1);
+        # lmodroid fetch
         if [ -z "$SYSTEM_VER" ]; then
-          ui_print "- Unable to grab properties of ro.lmodroid.version.";
-          ui_print "- Aborting installation to prevent compatibility issues.";
-          umount /mnt/temp_system;
-          $BIN/lptools_static unmap system;
-          exit 1;
+          ui_print "- Unable to grab properties of ro.lineage.build.version.";
+          ui_print "- Checking if this is LibreMobileOS...";
+          LINEAGE_CHECK=0;
+          EOS_CHECK=0;
+          LMODROID_CHECK=1;
+          SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lmodroid.version" | cut -d'=' -f2 | cut -d'.' -f1);
+          # check if SYSTEM_VER is empty again
+          if [ -z "$SYSTEM_VER" ]; then
+            ui_print "- Unable to grab properties of ro.lmodroid.version.";
+            ui_print "- Aborting installation to prevent compatibility issues.";
+            umount /mnt/temp_system;
+            umount /mnt/temp_product;
+            $BIN/lptools_static unmap product;
+            $BIN/lptools_static unmap system;
+            exit 1;
+          fi
         fi
       fi
+      # check if SYSTEM_VER is supported
       if [ "$SYSTEM_VER" != "22" && "$SYSTEM_VER" != "23" && "$SYSTEM_VER" != "3" && "$SYSTEM_VER" != "4" && "$SYSTEM_VER" != "6" ]; then
         ui_print "- This OS is not supported.";
         ui_print "- Aborting installation to prevent compatibility issues.";
@@ -79,23 +100,39 @@ if [ $IS_ON_RECOVERY -eq 1 ]; then
         exit 1;
       fi
     elif [ $SUPER_EXIST -eq 0 ]; then
+      # lineageos fetch
+      LINEAGE_CHECK=1;
+      EOS_CHECK=0;
+      LMODROID_CHECK=0;
       mkdir -p /tmp/temp_system;
       mount -t ext4 -o ro /dev/block/bootdevice/by-name/system /tmp/temp_system;
-      SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lineage.build.version" | cut -d'=' -f2 | cut -d'.' -f1);
-      # check if SYSTEM_VER is empty
+      SYSTEM_VER=$(cat /tmp/temp_system/product/etc/build.prop | grep "ro.lineage.build.version" | cut -d'=' -f2 | cut -d'.' -f1);
+      # /e/ fetch
       if [ -z "$SYSTEM_VER" ]; then
         ui_print "- Unable to grab properties of ro.lineage.build.version.";
-        ui_print "- Checking if this is LibreMobileOS...";
-        LMODROID_CHECK=1;
-        SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lmodroid.version" | cut -d'=' -f2 | cut -d'.' -f1);
-        # check if SYSTEM_VER is empty again
+        ui_print "- Checking if this is /e/ OS...";
+        LINEAGE_CHECK=0;
+        EOS_CHECK=1;
+        LMODROID_CHECK=0;
+        SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lineage.build.version" | cut -d'=' -f2 | cut -d'.' -f1);
+        # lmodroid fetch
         if [ -z "$SYSTEM_VER" ]; then
-          ui_print "- Unable to grab properties of ro.lmodroid.version.";
-          ui_print "- Aborting installation to prevent compatibility issues.";
-          umount /mnt/temp_system;
-          exit 1;
+          ui_print "- Unable to grab properties of ro.lineage.build.version.";
+          ui_print "- Checking if this is LibreMobileOS...";
+          LINEAGE_CHECK=0;
+          EOS_CHECK=0;
+          LMODROID_CHECK=1;
+          SYSTEM_VER=$(cat /tmp/temp_system/system/build.prop | grep "ro.lmodroid.version" | cut -d'=' -f2 | cut -d'.' -f1);
+          # check if SYSTEM_VER is empty again
+          if [ -z "$SYSTEM_VER" ]; then
+            ui_print "- Unable to grab properties of ro.lmodroid.version.";
+            ui_print "- Aborting installation to prevent compatibility issues.";
+            umount /mnt/temp_system;
+            exit 1;
+          fi
         fi
       fi
+      # check if SYSTEM_VER is supported
       if [ "$SYSTEM_VER" != "22" && "$SYSTEM_VER" != "23" && "$SYSTEM_VER" != "3" && "$SYSTEM_VER" != "4" && "$SYSTEM_VER" != "6" ]; then
         ui_print "- This OS is not supported.";
         ui_print "- Aborting installation to prevent compatibility issues.";
@@ -106,11 +143,16 @@ if [ $IS_ON_RECOVERY -eq 1 ]; then
   fi
 elif [ $IS_ON_RECOVERY -eq 0 ]; then
   if [ $KERNEL_BUILD_TYPE == "Weekly" ];then
+    LINEAGE_CHECK=1;
+    EOS_CHECK=1;
+    LMODROID_CHECK=0;
     SYSTEM_VER=$(getprop ro.lineage.build.version | cut -d'.' -f1);
     # check if SYSTEM_VER is empty
       if [ -z "$SYSTEM_VER" ]; then
         ui_print "- Unable to grab properties of ro.lineage.build.version.";
         ui_print "- Checking if this is LibreMobileOS...";
+        LINEAGE_CHECK=0;
+        EOS_CHECK=0;
         LMODROID_CHECK=1;
         SYSTEM_VER=$(getprop ro.lmodroid.version | cut -d'.' -f1)
         # check if SYSTEM_VER is empty again
@@ -131,17 +173,11 @@ fi
 # print build and device information
 if [ $LMODROID_CHECK -eq 1 ]; then
   if [ $KERNEL_BUILD_TYPE == "Weekly" ]; then
-    if [ $SYSTEM_VER == "6" ]; then
-      ui_print "- LibreMobileOS Version: $SYSTEM_VER";
-    fi
+    ui_print "- LibreMobileOS Version: $SYSTEM_VER";
   fi
-else
+elif [ $LINEAGE_CHECK -eq 1 ] || [ $EOS_CHECK -eq 1 ]; then
   if [ $KERNEL_BUILD_TYPE == "Weekly" ]; then
-    if [ $SYSTEM_VER == "22" || $SYSTEM_VER == "23" ]; then
-      ui_print "- LineageOS Version: $SYSTEM_VER";
-    elif [ $SYSTEM_VER == "3" || $SYSTEM_VER == "4" ]; then
-      ui_print "- /e/ OS Version: $SYSTEM_VER";
-    fi
+    ui_print "- OS Version: $SYSTEM_VER";
   fi
 fi
 ui_print "- Kernel Build Type: $KERNEL_BUILD_TYPE";
