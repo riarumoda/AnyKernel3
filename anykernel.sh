@@ -168,10 +168,6 @@ elif [ $IS_ON_RECOVERY -eq 0 ]; then
           if [ -z "$SYSTEM_VER" ]; then
             ui_print "- Unable to grab properties of ro.lmodroid.version.";
             ui_print "- Aborting installation to prevent compatibility issues.";
-            umount /tmp/temp_system;
-            umount /tmp/temp_product;
-            $BIN/lptools_static unmap product;
-            $BIN/lptools_static unmap system;
             exit 1;
           fi
         fi
