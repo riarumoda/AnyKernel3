@@ -83,8 +83,8 @@ if [ $IS_ON_RECOVERY -eq 1 ]; then
           if [ -z "$SYSTEM_VER" ]; then
             ui_print "- Unable to grab properties of ro.lmodroid.version.";
             ui_print "- Aborting installation to prevent compatibility issues.";
-            umount /mnt/temp_system;
-            umount /mnt/temp_product;
+            umount /tmp/temp_system;
+            umount /tmp/temp_product;
             $BIN/lptools_static unmap product;
             $BIN/lptools_static unmap system;
             exit 1;
@@ -95,7 +95,7 @@ if [ $IS_ON_RECOVERY -eq 1 ]; then
       if [ "$SYSTEM_VER" != "22" && "$SYSTEM_VER" != "23" && "$SYSTEM_VER" != "3" && "$SYSTEM_VER" != "4" && "$SYSTEM_VER" != "6" ]; then
         ui_print "- This OS is not supported.";
         ui_print "- Aborting installation to prevent compatibility issues.";
-        umount /mnt/temp_system;
+        umount /tmp/temp_system;
         $BIN/lptools_static unmap system;
         exit 1;
       fi
@@ -127,7 +127,7 @@ if [ $IS_ON_RECOVERY -eq 1 ]; then
           if [ -z "$SYSTEM_VER" ]; then
             ui_print "- Unable to grab properties of ro.lmodroid.version.";
             ui_print "- Aborting installation to prevent compatibility issues.";
-            umount /mnt/temp_system;
+            umount /tmp/temp_system;
             exit 1;
           fi
         fi
@@ -136,7 +136,7 @@ if [ $IS_ON_RECOVERY -eq 1 ]; then
       if [ "$SYSTEM_VER" != "22" && "$SYSTEM_VER" != "23" && "$SYSTEM_VER" != "3" && "$SYSTEM_VER" != "4" && "$SYSTEM_VER" != "6" ]; then
         ui_print "- This OS is not supported.";
         ui_print "- Aborting installation to prevent compatibility issues.";
-        umount /mnt/temp_system;
+        umount /tmp/temp_system;
         exit 1;
       fi
     fi
