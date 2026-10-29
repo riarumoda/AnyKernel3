@@ -42,6 +42,7 @@ PATCH_VBMETA_FLAG=auto;
 
 # print build and device information
 ui_print "- Kernel Build Type: $KERNEL_BUILD_TYPE";
+ui_print "- Kernel base version: $KERNEL_VERSION";
 ui_print "- Is vendor_boot partition exist: $VENDOR_BOOT_EXIST";
 ui_print "- Is installer running in recovery: $IS_ON_RECOVERY";
 
@@ -55,3 +56,9 @@ elif [ "$KERNEL_VERSION" == "5" ]; then
 else
   exit 1;
 fi
+
+# Installation finished
+ui_print " ";
+ui_print "- Installation finished! Force reboot your";
+ui_print "  phone if the recovery hung up/stuck!";
+ui_print " ";
