@@ -132,7 +132,6 @@ split_boot() {
     (set -o pipefail; magiskboot unpack -h $BOOTIMG 2>&1 | tee infotmp >&2);
     case $? in
       1) splitfail=1;;
-      2) touch chromeos;;
     esac;
   fi;
 
@@ -481,10 +480,8 @@ flash_boot() {
 
   cd $AKHOME;
   if [ -f "$BIN/futility" -a -d "$BIN/chromeos" ]; then
-    if [ -f "$SPLITIMG/chromeos" ]; then
-      echo "Signing with CHROMEOS..." >&2;
-      futility vbutil_kernel --pack boot-new-signed.img --keyblock $BIN/chromeos/kernel.keyblock --signprivate $BIN/chromeos/kernel_data_key.vbprivk --version 1 --vmlinuz boot-new.img --bootloader $BIN/chromeos/empty --config $BIN/chromeos/empty --arch arm --flags 0x1;
-    fi;
+    echo "Signing with CHROMEOS..." >&2;
+    futility vbutil_kernel --pack boot-new-signed.img --keyblock $BIN/chromeos/kernel.keyblock --signprivate $BIN/chromeos/kernel_data_key.vbprivk --version 1 --vmlinuz boot-new.img --bootloader $BIN/chromeos/empty --config $BIN/chromeos/empty --arch arm --flags 0x1;
     [ $? != 0 ] && signfail=1;
   fi;
   if [ -d "$BIN/avb" ]; then
@@ -502,7 +499,7 @@ flash_boot() {
     else
       if magiskboot verify boot.img; then
         echo "Signing with AVBv1 /$avbtype..." >&2;
-        magiskboot sign /$avbtype boot-new.img $cert $pk8;
+        magiskboot sign-avb1 boot-new.img /$avbtype $cert $pk8;
       fi;
     fi;
   fi;
