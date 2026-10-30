@@ -47,18 +47,10 @@ ui_print "- Is vendor_boot partition exist: $VENDOR_BOOT_EXIST";
 ui_print "- Is installer running in recovery: $IS_ON_RECOVERY";
 
 # boot install
-if [ "$KERNEL_VERSION" == "4" ]; then
-  dump_boot;
-  write_boot;
-elif [ "$KERNEL_VERSION" == "5" ]; then
-  split_boot;
-  flash_boot;
-else
-  exit 1;
-fi
+dump_boot;
+write_boot;
 
 # Installation finished
 ui_print " ";
-ui_print "- Installation finished! Force reboot your";
-ui_print "  phone if the recovery hung up/stuck!";
+ui_print "- Installation finished! Force reboot your phone if the recovery hung up/stuck!";
 ui_print " ";
